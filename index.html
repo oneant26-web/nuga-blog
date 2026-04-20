@@ -484,26 +484,40 @@ function setDot(id, cls) {
   if(el) el.className = 'dot'+(cls?' '+cls:'');
 }
 
-// SAVE KEYS
+// SAVE KEYS (localStorage 영구 저장)
 function saveClaude() {
   var k = document.getElementById('claudeInp').value.trim();
   if(!k.startsWith('sk-ant-')) { showMsg('claudeMsg','err','API 키 형식이 올바르지 않습니다 (sk-ant-... 형태)'); return; }
-  G.claudeKey = k; updateDots();
-  showMsg('claudeMsg','ok','✓ Claude API 키가 저장됐습니다');
+  G.claudeKey = k;
+  localStorage.setItem('nugo_claude_key', k);
+  updateDots();
+  showMsg('claudeMsg','ok','✓ Claude API 키가 저장되었습니다 (브라우저에 영구 저장)');
 }
 function saveGemini() {
   var k = document.getElementById('geminiInp').value.trim();
   if(!k.startsWith('AIza')) { showMsg('geminiMsg','err','API 키 형식이 올바르지 않습니다 (AIza... 형태)'); return; }
-  G.geminiKey = k; updateDots();
-  showMsg('geminiMsg','ok','✓ Gemini API 키가 저장됐습니다');
+  G.geminiKey = k;
+  localStorage.setItem('nugo_gemini_key', k);
+  updateDots();
+  showMsg('geminiMsg','ok','✓ Gemini API 키가 저장되었습니다 (브라우저에 영구 저장)');
 }
 function saveNotionKey() {
   var k = document.getElementById('notionInp').value.trim();
   if(!k.startsWith('secret_') && !k.startsWith('ntn_')) { showMsg('notionKeyMsg','err','Token 형식이 올바르지 않습니다 (secret_... 또는 ntn_...)'); return; }
-  G.notionToken = k; updateDots();
-  showMsg('notionKeyMsg','ok','✓ Notion Token이 저장됐습니다');
+  G.notionToken = k;
+  localStorage.setItem('nugo_notion_token', k);
+  updateDots();
+  showMsg('notionKeyMsg','ok','✓ Notion Token이 저장되었습니다 (브라우저에 영구 저장)');
 }
-
+function loadSavedKeys() {
+  var ck = localStorage.getItem('nugo_claude_key');
+  var gk = localStorage.getItem('nugo_gemini_key');
+  var nt = localStorage.getItem('nugo_notion_token');
+  if(ck) { G.claudeKey = ck; document.getElementById('claudeInp').value = ck; }
+  if(gk) { G.geminiKey = gk; document.getElementById('geminiInp').value = gk; }
+  if(nt) { G.notionToken = nt; document.getElementById('notionInp').value = nt; }
+  if(ck||gk||nt) updateDots();
+}
 // UTILS
 function showMsg(id, type, html) {
   var el = document.getElementById(id); if(!el) return;
@@ -727,7 +741,7 @@ function resetAll() {
 }
 
 // INIT
-updateDots(); gotoStep(0); renderHistory();
+loadSavedKeys(); updateDots(); gotoStep(0); renderHistory();
 </script>
 </body>
 </html>
