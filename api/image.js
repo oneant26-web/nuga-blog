@@ -12,8 +12,8 @@ export default async function handler(req, res) {
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ error: '프롬프트가 없습니다.' });
 
-  // gemini-2.0-flash-preview-image-generation — 무료 할당량 있음
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${geminiKey}`;
+  // gemini-2.0-flash-exp — 무료 이미지 생성 가능
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiKey}`;
 
   try {
     const response = await fetch(url, {
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     const imgPart = parts.find(p => p.inlineData);
 
     if (!imgPart) {
-      return res.status(500).json({ error: `이미지 미생성. 전체응답: ${JSON.stringify(data).substring(0, 300)}` });
+      return res.status(500).json({ error: `이미지 미생성. 응답: ${JSON.stringify(data).substring(0, 300)}` });
     }
 
     return res.status(200).json({
