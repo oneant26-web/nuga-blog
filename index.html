@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>누가한의원 블로그 스튜디오</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f4f1ec; --surface:#fff; --surf2:#faf8f4; --border:#e5dfd5; --border2:#cfc8bc;
+  --text:#1c1917; --sub:#6b6560; --hint:#a8a29e;
+  --green:#2d6a4f; --greenl:#e8f4ee; --greend:#1b4332;
+  --amber:#b45309; --amberl:#fef3c7;
+  --blue:#1e40af; --bluel:#eff6ff;
+  --red:#991b1b; --redl:#fef2f2;
+  --r:10px; --rsm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
+.shell{display:grid;grid-template-columns:252px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{background:#1c1917;color:#fff;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-head{padding:24px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.logo{font-family:'Noto Serif KR',serif;font-size:18px;color:#fff;line-height:1.3}
+.logo em{color:#6ee7b7;font-style:normal}
+.logo-sub{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+.sb-nav{flex:1;padding:12px 0}
+.sb-sec{padding:10px 20px 4px;font-size:10px;color:rgba(255,255,255,.28);letter-spacing:.12em;text-transform:uppercase;font-weight:500}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 20px;cursor:pointer;color:rgba(255,255,255,.5);font-size:13px;border-left:2px solid transparent;transition:all .15s}
+.ni:hover{color:rgba(255,255,255,.8);background:rgba(255,255,255,.04)}
+.ni.active{color:#fff;background:rgba(110,231,183,.1);border-left-color:#6ee7b7;font-weight:500}
+.ni-ico{font-size:14px;width:18px;text-align:center;flex-shrink:0}
+.ni-badge{margin-left:auto;background:#6ee7b7;color:#065f46;font-size:9px;font-weight:700;padding:1px 5px;border-radius:99px}
+.sb-foot{padding:18px 20px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:rgba(255,255,255,.28);line-height:1.8}
+
+/* MAIN */
+.main{overflow-y:auto;min-height:100vh}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.tb-title{font-size:15px;font-weight:500}
+.tb-sub{font-size:11px;color:var(--hint);margin-top:1px}
+.tb-dots{display:flex;align-items:center;gap:12px}
+.api-dot{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--hint)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--border2);display:inline-block}
+.dot.ok{background:#34d399} .dot.err{background:#f87171}
+.content{padding:24px 28px}
+.panel{display:none} .panel.active{display:block}
+
+/* STEP BAR */
+.stepbar{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
+.step{flex:1;padding:12px 8px;text-align:center;font-size:12px;color:var(--hint);border-right:1px solid var(--border);cursor:pointer;transition:all .15s}
+.step:last-child{border-right:none}
+.step:hover{background:var(--surf2);color:var(--sub)}
+.step.active{background:var(--greenl);color:var(--greend);font-weight:700}
+.step.done{color:var(--green)}
+.step.done::before{content:'✓ '}
+.step-n{display:block;font-size:9px;color:var(--hint);margin-bottom:2px;font-weight:400;text-transform:uppercase;letter-spacing:.06em}
+.step.active .step-n,.step.done .step-n{color:var(--green)}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;margin-bottom:14px}
+.card-title{font-size:11px;font-weight:700;color:var(--hint);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* FORM */
+.field{margin-bottom:14px} .field:last-child{margin-bottom:0}
+label{display:block;font-size:12px;font-weight:500;color:var(--sub);margin-bottom:5px}
+input[type=text],input[type=password],textarea,select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--rsm);background:var(--surf2);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--green);background:var(--surface)}
+textarea{resize:vertical;line-height:1.7}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* BUTTON */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:var(--rsm);font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:none;white-space:nowrap}
+.btn-primary{background:var(--green);color:#fff} .btn-primary:hover{background:var(--greend)}
+.btn-sec{background:var(--surf2);color:var(--text);border:1.5px solid var(--border)} .btn-sec:hover{border-color:var(--green);color:var(--green)}
+.btn-blue{background:var(--blue);color:#fff} .btn-blue:hover{background:#1e3a8a}
+.btn-amber{background:var(--amber);color:#fff} .btn-amber:hover{background:#92400e}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-lg{padding:12px 24px;font-size:14px} .btn-full{width:100%}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+/* ALERT */
+.alert{display:flex;align-items:flex-start;gap:9px;padding:10px 14px;border-radius:var(--rsm);font-size:12px;line-height:1.65;margin-top:10px}
+.al-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.al-ok{background:var(--greenl);color:var(--greend);border:1px solid #a7f3d0}
+.al-warn{background:var(--amberl);color:#78350f;border:1px solid #fcd34d}
+.al-err{background:var(--redl);color:var(--red);border:1px solid #fca5a5}
+.al-info{background:var(--bluel);color:var(--blue);border:1px solid #bfdbfe}
+
+/* PROGRESS */
+.prog-wrap{margin-top:14px}
+.prog-lbl{font-size:11px;color:var(--sub);margin-bottom:5px;display:flex;justify-content:space-between}
+.prog-bg{height:5px;background:var(--border);border-radius:99px;overflow:hidden}
+.prog-bar{height:100%;background:var(--green);border-radius:99px;transition:width .5s ease}
+
+/* PREVIEW */
+.preview-box{background:var(--surf2);border:1.5px solid var(--border);border-radius:var(--rsm);padding:14px 16px;font-size:13px;line-height:1.8;white-space:pre-wrap;max-height:340px;overflow-y:auto;margin-top:10px;color:var(--text)}
+
+/* IMAGE GRID */
+.img-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.img-slot{aspect-ratio:1/1;border:2px dashed var(--border);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:var(--surf2);overflow:hidden;position:relative;transition:all .2s}
+.img-slot.loading{border-style:solid;border-color:var(--green);animation:pulse 1.4s ease-in-out infinite}
+.img-slot.loaded{border-style:solid;border-color:var(--green)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.img-slot img{width:100%;height:100%;object-fit:cover}
+.slot-lbl{font-size:10px;color:var(--hint);text-align:center;padding:0 6px;line-height:1.5}
+.slot-ico{font-size:22px}
+.dl-btn{position:absolute;bottom:7px;right:7px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:5px;padding:3px 9px;font-size:10px;cursor:pointer;display:none;font-family:'Noto Sans KR',sans-serif}
+.img-slot:hover .dl-btn{display:block}
+.spinner{width:22px;height:22px;border:2.5px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SETTINGS */
+.set-row{display:flex;align-items:flex-start;gap:16px;padding:16px 0;border-bottom:1px solid var(--border)}
+.set-row:last-child{border-bottom:none}
+.set-lbl{font-size:13px;font-weight:500}
+.set-desc{font-size:11px;color:var(--hint);margin-top:2px;line-height:1.6}
+.set-ctrl{flex-shrink:0;display:flex;gap:7px;align-items:center}
+.api-inp{min-width:210px;font-family:'Courier New',monospace;font-size:11px}
+
+/* FOOTER BAR */
+.panel-foot{display:flex;gap:8px;flex-wrap:wrap;padding-top:18px;border-top:1px solid var(--border);margin-top:4px}
+
+/* HISTORY */
+.hist-item{display:flex;align-items:center;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--rsm);background:var(--surface);margin-bottom:8px;cursor:pointer;transition:box-shadow .15s}
+.hist-item:hover{box-shadow:0 2px 12px rgba(0,0,0,.07)}
+.hist-ico{font-size:18px;flex-shrink:0}
+.hist-title{font-size:13px;font-weight:500}
+.hist-meta{font-size:11px;color:var(--hint);margin-top:1px}
+
+/* NOTION LINK */
+.notion-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--blue);font-weight:500;text-decoration:none;padding:6px 12px;background:var(--bluel);border-radius:var(--rsm);border:1px solid #bfdbfe;margin-top:10px;transition:all .15s}
+.notion-link:hover{background:#dbeafe}
+
+/* TAG */
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:500}
+.tg-green{background:var(--greenl);color:var(--greend)}
+.tg-amber{background:var(--amberl);color:#78350f}
+.tg-blue{background:var(--bluel);color:var(--blue)}
+.tg-red{background:var(--redl);color:var(--red)}
+.tg-gray{background:#f5f5f4;color:var(--sub)}
+
+code{font-family:'Courier New',monospace;font-size:11px;background:var(--surf2);padding:1px 5px;border-radius:3px;border:1px solid var(--border)}
+
+@media(max-width:768px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{position:relative;height:auto}
+  .content{padding:16px}
+  .topbar{padding:12px 16px}
+  .row2{grid-template-columns:1fr}
+  .img-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-head">
+    <div class="logo">누가<em>한의원</em><br>블로그 스튜디오</div>
+    <div class="logo-sub">Blog Studio v3.0</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">워크플로우</div>
+    <div class="ni active" onclick="showPanel('write')"><span class="ni-ico">✍️</span>새 글 작성</div>
+    <div class="ni" onclick="showPanel('images')"><span class="ni-ico">🖼️</span>이미지 생성</div>
+    <div class="ni" onclick="showPanel('history')">
+      <span class="ni-ico">📚</span>작성 기록
+      <span class="ni-badge" id="histBadge">0</span>
+    </div>
+    <div class="sb-sec" style="margin-top:10px">설정</div>
+    <div class="ni" onclick="showPanel('settings')"><span class="ni-ico">⚙️</span>API 키 설정</div>
+  </nav>
+  <div class="sb-foot">
+    📍 대구 수성구 용학로 294<br>동아백화점 뒷편 아리따움 2층<br>☎ 053-784-8240
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="tb-title" id="tbTitle">새 블로그 글 작성</div>
+      <div class="tb-sub" id="tbSub">Claude Sonnet이 누가한의원 문체에 맞는 글을 자동으로 작성합니다</div>
+    </div>
+    <div class="tb-dots">
+      <div class="api-dot"><span class="dot" id="dotClaude"></span>Claude</div>
+      <div class="api-dot"><span class="dot" id="dotGemini"></span>Gemini</div>
+      <div class="api-dot"><span class="dot" id="dotNotion"></span>Notion</div>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- ══ WRITE ══ -->
+    <div class="panel active" id="panel-write">
+      <div class="stepbar">
+        <div class="step active" id="s0" onclick="gotoStep(0)"><span class="step-n">Step 1</span>글 정보 입력</div>
+        <div class="step" id="s1" onclick="gotoStep(1)"><span class="step-n">Step 2</span>글 생성 · 검토</div>
+        <div class="step" id="s2" onclick="gotoStep(2)"><span class="step-n">Step 3</span>노션 저장</div>
+      </div>
+
+      <!-- STEP 0: 입력 -->
+      <div id="ws0">
+        <div class="card">
+          <div class="card-title">📝 글 정보 입력</div>
+          <div class="field">
+            <label>핵심 키워드 *</label>
+            <input type="text" id="kw" placeholder="예) 허리 삐끗, 요추 염좌, 급성요통" />
+          </div>
+          <div class="field">
+            <label>포함할 내용 *</label>
+            <textarea id="ct" rows="3" placeholder="예) 자고 일어난 후 갑자기 허리 못 펼 때 원인(요방형근), 응급처치법(허리띠 졸라매기), 한의원 침치료로 빠른 회복"></textarea>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>글 유형</label>
+              <select id="postType">
+                <option value="증상별 치료">증상별 치료</option>
+                <option value="한약·제품 소개">한약·제품 소개</option>
+                <option value="건강 상식">건강 상식</option>
+                <option value="원장 일상">원장 일상</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>글 길이</label>
+              <select id="postLen">
+                <option value="짧게 (~800자)">짧게 (~800자)</option>
+                <option value="보통 (~1500자)" selected>보통 (~1500자)</option>
+                <option value="길게 (~2500자)">길게 (~2500자)</option>
+                <option value="아주 길게 (~3500자)">아주 길게 (~3500자)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="panel-foot">
+          <button class="btn btn-primary btn-lg" onclick="startGen()">✨ 글 자동 생성 시작</button>
+          <button class="btn btn-sec" onclick="showPanel('settings')">⚙️ API 설정 확인</button>
+        </div>
+      </div>
+
+      <!-- STEP 1: 생성 -->
+      <div id="ws1" style="display:none">
+        <div class="card">
+          <div class="card-title">⚡ 생성 진행상황</div>
+          <div id="genMsg" class="alert al-info" style="display:none">
+            <span class="al-icon">⏳</span><span id="genMsgTxt"></span>
+          </div>
+          <div class="prog-wrap" id="progWrap" style="display:none">
+            <div class="prog-lbl"><span id="progLbl">준비 중...</span><span id="progPct">0%</span></div>
+            <div class="prog-bg"><div class="prog-bar" id="progBar" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div id="resultCard" style="display:none">
+          <div class="card">
+            <div class="card-title">📌 생성된 제목</div>
+            <div style="font-size:15px;font-weight:700;line-height:1.5" id="resTitle"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">📝 생성된 본문</div>
+            <div style="margin-bottom:8px">
+              <span class="tag" id="tagType"></span>&nbsp;<span class="tag" id="tagLen"></span>
+            </div>
+            <div class="preview-box" id="resBody"></div>
+            <div class="btn-group">
+              <button class="btn btn-sec" onclick="copyBody()">📋 본문 복사</button>
+              <button class="btn btn-sec" onclick="regen()">🔄 다시 생성</button>
+            </div>
+          </div>
+          <div class="panel-foot">
+            <button class="btn btn-primary btn-lg" onclick="goNotion()">📥 노션에 저장하기 →</button>
+            <button class="btn btn-amber" onclick="goImages()">🖼️ 이미지 생성하기 →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: 노션 저장 -->
+      <div id="ws2" style="display:none">
+        <div class="card">
+          <div class="card-title">📥 노션 DB 저장</div>
+          <div class="row2">
+            <div class="field">
+              <label>글 제목</label>
+              <input type="text" id="saveTitle" readonly style="background:var(--surf2)" />
+            </div>
+            <div class="field">
+              <label>저장 상태</label>
+              <select id="saveStatus">
+                <option value="작성중">작성중</option>
+                <option value="검토완료">검토완료</option>
+                <option value="발행완료">발행완료</option>
+              </select>
+            </div>
+          </div>
+          <div id="notionMsg"></div>
+        </div>
+        <div class="panel-foot">
+          <button class="btn btn-primary btn-lg" onclick="saveNotion()" id="notionSaveBtn">📥 노션 저장 실행</button>
+          <button class="btn btn-sec" onclick="gotoStep(1)">← 결과 다시 보기</button>
+        </div>
+        <div id="notionDone" style="display:none">
+          <div class="card" style="border-color:#6ee7b7">
+            <div class="card-title">✅ 저장 완료</div>
+            <div style="font-size:13px;color:var(--sub);line-height:1.8">노션 DB에 새 페이지가 생성됐습니다.</div>
+            <a class="notion-link" id="notionLink" href="#" target="_blank">🔗 노션에서 열기</a>
+            <div class="btn-group">
+              <button class="btn btn-amber" onclick="goImages()">🖼️ 이미지 생성하기 →</button>
+              <button class="btn btn-sec" onclick="resetAll()">✍️ 새 글 작성</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ IMAGES ══ -->
+    <div class="panel" id="panel-images">
+      <div class="card">
+        <div class="card-title">🎨 블로그 이미지 자동 생성 (Gemini Imagen 3)</div>
+        <div class="row2">
+          <div class="field">
+            <label>블로그 제목</label>
+            <input type="text" id="imgTitle" placeholder="글 작성 후 자동 입력됩니다" />
+          </div>
+          <div class="field">
+            <label>핵심 키워드</label>
+            <input type="text" id="imgKw" placeholder="키워드 직접 입력 가능" />
+          </div>
+        </div>
+        <div class="field">
+          <label>이미지 분위기</label>
+          <select id="imgStyle">
+            <option value="warm">따뜻하고 친근한 (기본)</option>
+            <option value="clean">깔끔한 미니멀</option>
+            <option value="natural">자연스러운 일상</option>
+            <option value="professional">전문적·의료적</option>
+          </select>
+        </div>
+        <div class="img-grid">
+          <div class="img-slot" id="slot0"><span class="slot-ico">📸</span><div class="slot-lbl">실사 썸네일<br><span style="font-size:9px">제목 대표 이미지</span></div></div>
+          <div class="img-slot" id="slot1"><span class="slot-ico">🎨</span><div class="slot-lbl">일러스트 1<br><span style="font-size:9px">원인·설명</span></div></div>
+          <div class="img-slot" id="slot2"><span class="slot-ico">🎨</span><div class="slot-lbl">일러스트 2<br><span style="font-size:9px">치료·해결</span></div></div>
+        </div>
+        <div id="imgMsg" style="margin-top:10px"></div>
+      </div>
+      <div class="panel-foot">
+        <button class="btn btn-primary btn-lg" onclick="genImages()" id="imgBtn">✨ 이미지 3장 생성하기</button>
+      </div>
+    </div>
+
+    <!-- ══ HISTORY ══ -->
+    <div class="panel" id="panel-history">
+      <div class="card">
+        <div class="card-title">📚 이번 세션 작성 기록</div>
+        <div id="histList">
+          <div style="text-align:center;padding:36px;color:var(--hint);font-size:13px">아직 작성된 글이 없습니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SETTINGS ══ -->
+    <div class="panel" id="panel-settings">
+      <div class="card">
+        <div class="card-title">🤖 Claude API — 블로그 글 생성</div>
+        <div class="alert al-info" style="margin-bottom:14px">
+          <span class="al-icon">ℹ️</span>
+          <div>Vercel 서버리스 함수를 통해 Claude Sonnet 4로 블로그 글을 생성합니다.<br>
+          API 키는 브라우저에서 서버로만 전달되며 외부에 저장되지 않습니다.<br>
+          <a href="https://console.anthropic.com" target="_blank" style="color:var(--blue)">console.anthropic.com → API Keys</a></div>
+        </div>
+        <div class="set-row">
+          <div style="flex:1">
+            <div class="set-lbl">Anthropic API Key</div>
+            <div class="set-desc"><code>sk-ant-</code>로 시작 · 글 자동 생성에 사용</div>
+          </div>
+          <div class="set-ctrl">
+            <span class="dot" id="dotClaude2"></span>
+            <input type="password" id="claudeInp" class="api-inp" placeholder="sk-ant-api03-..." />
+            <button class="btn btn-sec" onclick="saveClaude()">저장</button>
+          </div>
+        </div>
+        <div id="claudeMsg"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔮 Gemini API — 이미지 생성</div>
+        <div class="alert al-info" style="margin-bottom:14px">
+          <span class="al-icon">ℹ️</span>
+          <div>Gemini Imagen 3으로 블로그 이미지를 생성합니다. (CORS 허용, 브라우저 직접 호출)<br>
+          <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--blue)">aistudio.google.com → Get API Key</a> · 유료 플랜 필요</div>
+        </div>
+        <div class="set-row">
+          <div style="flex:1">
+            <div class="set-lbl">Gemini API Key</div>
+            <div class="set-desc"><code>AIza</code>로 시작 · 이미지 생성(Imagen 3)에 사용</div>
+          </div>
+          <div class="set-ctrl">
+            <span class="dot" id="dotGemini2"></span>
+            <input type="password" id="geminiInp" class="api-inp" placeholder="AIzaSy..." />
+            <button class="btn btn-sec" onclick="saveGemini()">저장</button>
+          </div>
+        </div>
+        <div id="geminiMsg"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 Notion API — DB 자동 저장</div>
+        <div class="set-row">
+          <div style="flex:1">
+            <div class="set-lbl">Notion Integration Token</div>
+            <div class="set-desc">
+              <code>secret_</code> 또는 <code>ntn_</code>으로 시작<br>
+              notion.so → Settings → Connections → Develop or manage integrations → New integration<br>
+              생성 후 블로그 DB 페이지에서 <code>···</code> → Connections → 인테그레이션 연결 필수
+            </div>
+          </div>
+          <div class="set-ctrl">
+            <span class="dot" id="dotNotion2"></span>
+            <input type="password" id="notionInp" class="api-inp" placeholder="secret_..." />
+            <button class="btn btn-sec" onclick="saveNotionKey()">저장</button>
+          </div>
+        </div>
+        <div id="notionKeyMsg"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">ℹ️ 배포 정보</div>
+        <div style="font-size:12px;color:var(--sub);line-height:2.2">
+          <strong>글 생성 경로:</strong> 브라우저 → Vercel Function(/api/generate) → Claude API<br>
+          <strong>이미지 생성:</strong> 브라우저 → Gemini Imagen 3 (직접 호출)<br>
+          <strong>노션 저장:</strong> 브라우저 → Notion API (직접 호출)<br>
+          <strong>DB ID:</strong> <code>7793c2a4-689a-46b1-b39c-7e4864c40cc7</code> (내장됨)<br>
+          <strong>보안:</strong> API 키는 이 탭 메모리에만 저장, 로컬스토리지 미사용
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<script>
+var G = { claudeKey:'', geminiKey:'', notionToken:'', title:'', body:'', kw:'', ct:'', type:'', len:'', history:[] };
+var NOTION_DB = '7793c2a4-689a-46b1-b39c-7e4864c40cc7';
+
+// NAV
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  var idx = {write:0,images:1,history:2,settings:3};
+  document.querySelectorAll('.ni')[idx[name]].classList.add('active');
+  var titles = {
+    write: ['새 블로그 글 작성','Claude Sonnet이 누가한의원 문체에 맞는 글을 자동으로 작성합니다'],
+    images: ['블로그 이미지 생성','Gemini Imagen 3으로 실사·일러스트 이미지를 자동 생성합니다'],
+    history: ['작성 기록','이번 세션에서 생성된 글 목록입니다'],
+    settings: ['API 키 설정','Claude · Gemini · Notion API 키를 설정합니다']
+  };
+  document.getElementById('tbTitle').textContent = titles[name][0];
+  document.getElementById('tbSub').textContent = titles[name][1];
+}
+
+// STEP
+function gotoStep(n) {
+  ['ws0','ws1','ws2'].forEach((id,i) => document.getElementById(id).style.display = i===n?'block':'none');
+  [0,1,2].forEach(i => {
+    var el = document.getElementById('s'+i);
+    el.classList.remove('active','done');
+    if(i===n) el.classList.add('active');
+    else if(i<n) el.classList.add('done');
+  });
+}
+
+// DOTS
+function updateDots() {
+  ['dotClaude','dotClaude2'].forEach(id => setDot(id, G.claudeKey?'ok':''));
+  ['dotGemini','dotGemini2'].forEach(id => setDot(id, G.geminiKey?'ok':''));
+  ['dotNotion','dotNotion2'].forEach(id => setDot(id, G.notionToken?'ok':''));
+}
+function setDot(id, cls) {
+  var el = document.getElementById(id);
+  if(el) el.className = 'dot'+(cls?' '+cls:'');
+}
+
+// SAVE KEYS
+function saveClaude() {
+  var k = document.getElementById('claudeInp').value.trim();
+  if(!k.startsWith('sk-ant-')) { showMsg('claudeMsg','err','API 키 형식이 올바르지 않습니다 (sk-ant-... 형태)'); return; }
+  G.claudeKey = k; updateDots();
+  showMsg('claudeMsg','ok','✓ Claude API 키가 저장됐습니다');
+}
+function saveGemini() {
+  var k = document.getElementById('geminiInp').value.trim();
+  if(!k.startsWith('AIza')) { showMsg('geminiMsg','err','API 키 형식이 올바르지 않습니다 (AIza... 형태)'); return; }
+  G.geminiKey = k; updateDots();
+  showMsg('geminiMsg','ok','✓ Gemini API 키가 저장됐습니다');
+}
+function saveNotionKey() {
+  var k = document.getElementById('notionInp').value.trim();
+  if(!k.startsWith('secret_') && !k.startsWith('ntn_')) { showMsg('notionKeyMsg','err','Token 형식이 올바르지 않습니다 (secret_... 또는 ntn_...)'); return; }
+  G.notionToken = k; updateDots();
+  showMsg('notionKeyMsg','ok','✓ Notion Token이 저장됐습니다');
+}
+
+// UTILS
+function showMsg(id, type, html) {
+  var el = document.getElementById(id); if(!el) return;
+  var cls = {ok:'al-ok',err:'al-err',warn:'al-warn',info:'al-info'};
+  var ico = {ok:'✓',err:'✗',warn:'⚠️',info:'ℹ️'};
+  el.innerHTML = `<div class="alert ${cls[type]}"><span class="al-icon">${ico[type]}</span><span>${html}</span></div>`;
+}
+function setProgress(pct, lbl) {
+  document.getElementById('progWrap').style.display = 'block';
+  document.getElementById('progBar').style.width = pct+'%';
+  document.getElementById('progLbl').textContent = lbl;
+  document.getElementById('progPct').textContent = pct+'%';
+}
+function setGenMsg(type, txt) {
+  var el = document.getElementById('genMsg');
+  var cls = {ok:'al-ok',err:'al-err',info:'al-info'};
+  var ico = {ok:'✅',err:'❌',info:'⏳'};
+  el.className = 'alert '+cls[type]; el.style.display = 'flex';
+  el.querySelector('.al-icon').textContent = ico[type];
+  document.getElementById('genMsgTxt').textContent = txt;
+}
+
+// GENERATE via Vercel Function
+function startGen() {
+  var kw = document.getElementById('kw').value.trim();
+  var ct = document.getElementById('ct').value.trim();
+  if(!kw || !ct) { alert('핵심 키워드와 포함할 내용을 모두 입력해주세요.'); return; }
+  if(!G.claudeKey) { alert('먼저 설정 탭에서 Claude API 키를 입력해주세요.'); showPanel('settings'); return; }
+  G.kw=kw; G.ct=ct;
+  G.type=document.getElementById('postType').value;
+  G.len=document.getElementById('postLen').value;
+  gotoStep(1);
+  document.getElementById('resultCard').style.display = 'none';
+  setProgress(0,'준비 중...');
+  setGenMsg('info','Claude Sonnet에게 블로그 글을 요청하고 있습니다... (약 30초 소요)');
+  doGenerate();
+}
+
+async function doGenerate() {
+  try {
+    setProgress(20,'Vercel Function 경유 Claude API 요청 중...');
+    var res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-claude-key': G.claudeKey },
+      body: JSON.stringify({ keyword: G.kw, content: G.ct, postType: G.type, postLen: G.len })
+    });
+    setProgress(75,'응답 처리 중...');
+    var data = await res.json();
+    if(data.error) throw new Error(data.error);
+    G.title = data.title || '누가한의원 블로그';
+    G.body = data.body || '';
+    setProgress(100,'완료!');
+    setGenMsg('ok','글 생성이 완료됐습니다! 아래에서 내용을 확인하세요.');
+    showResult();
+    addHistory();
+  } catch(e) {
+    setGenMsg('err','오류: ' + e.message);
+    setProgress(0,'실패');
+  }
+}
+
+function showResult() {
+  document.getElementById('resultCard').style.display = 'block';
+  document.getElementById('resTitle').textContent = G.title;
+  document.getElementById('resBody').textContent = G.body;
+  var tc = {'증상별 치료':'tg-red','한약·제품 소개':'tg-amber','건강 상식':'tg-green','원장 일상':'tg-blue'};
+  var lc = {'짧게 (~800자)':'tg-gray','보통 (~1500자)':'tg-gray','길게 (~2500자)':'tg-amber','아주 길게 (~3500자)':'tg-red'};
+  document.getElementById('tagType').className = 'tag '+(tc[G.type]||'tg-gray');
+  document.getElementById('tagType').textContent = G.type;
+  document.getElementById('tagLen').className = 'tag '+(lc[G.len]||'tg-gray');
+  document.getElementById('tagLen').textContent = G.len;
+}
+function copyBody() {
+  navigator.clipboard.writeText(G.body).then(() => alert('본문이 클립보드에 복사됐습니다!\n네이버 블로그에 붙여넣기 하세요.'));
+}
+function regen() {
+  if(!confirm('다시 생성하면 현재 내용이 사라집니다. 계속할까요?')) return;
+  document.getElementById('resultCard').style.display = 'none';
+  setProgress(0,'준비 중...');
+  setGenMsg('info','Claude에게 블로그 글을 다시 요청합니다...');
+  doGenerate();
+}
+function goNotion() {
+  gotoStep(2);
+  document.getElementById('saveTitle').value = G.title;
+  document.getElementById('notionDone').style.display = 'none';
+  document.getElementById('notionMsg').innerHTML = '';
+  document.getElementById('notionSaveBtn').disabled = false;
+  document.getElementById('notionSaveBtn').textContent = '📥 노션 저장 실행';
+}
+function goImages() {
+  document.getElementById('imgTitle').value = G.title;
+  document.getElementById('imgKw').value = G.kw;
+  showPanel('images');
+}
+
+// NOTION SAVE
+async function saveNotion() {
+  if(!G.notionToken) { showMsg('notionMsg','err','설정 탭에서 Notion Integration Token을 먼저 입력해주세요.'); return; }
+  var btn = document.getElementById('notionSaveBtn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  showMsg('notionMsg','info','노션 DB에 페이지를 생성하고 있습니다...');
+  var status = document.getElementById('saveStatus').value;
+  try {
+    var payload = {
+      parent: { database_id: NOTION_DB },
+      properties: {
+        '글 제목': { title: [{text:{content:G.title}}] },
+        '핵심 키워드': { rich_text: [{text:{content:G.kw}}] },
+        '포함할 내용': { rich_text: [{text:{content:G.ct}}] },
+        '글 유형': { select: { name: G.type } },
+        '글 길이': { select: { name: G.len } },
+        '상태': { select: { name: status } }
+      },
+      children: buildBlocks(G.body)
+    };
+    var res = await fetch('https://api.notion.com/v1/pages', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+G.notionToken, 'Notion-Version':'2022-06-28' },
+      body: JSON.stringify(payload)
+    });
+    var data = await res.json();
+    if(data.object === 'error') throw new Error(data.message);
+    var url = data.url || 'https://www.notion.so/'+NOTION_DB;
+    document.getElementById('notionLink').href = url;
+    document.getElementById('notionDone').style.display = 'block';
+    showMsg('notionMsg','ok','✓ 노션 DB에 저장됐습니다!');
+    btn.textContent = '✓ 저장 완료';
+  } catch(e) {
+    showMsg('notionMsg','err','저장 실패: '+e.message+'<br>Notion Token과 DB 연결 설정을 확인해주세요.');
+    btn.disabled = false; btn.textContent = '📥 노션 저장 실행';
+  }
+}
+
+function buildBlocks(body) {
+  var lines = body.split('\n'), blocks = [];
+  for(var i=0; i<lines.length && blocks.length<95; i++) {
+    var l = lines[i];
+    if(l.startsWith('## ')) blocks.push({object:'block',type:'heading_2',heading_2:{rich_text:[{type:'text',text:{content:l.replace(/^## /,'')}}]}});
+    else if(l.startsWith('# ')) blocks.push({object:'block',type:'heading_1',heading_1:{rich_text:[{type:'text',text:{content:l.replace(/^# /,'')}}]}});
+    else if(l.match(/^[-*] /)) blocks.push({object:'block',type:'bulleted_list_item',bulleted_list_item:{rich_text:[{type:'text',text:{content:l.replace(/^[-*] /,'')}}]}});
+    else if(l==='---') blocks.push({object:'block',type:'divider',divider:{}});
+    else if(l.trim()==='') {}
+    else blocks.push({object:'block',type:'paragraph',paragraph:{rich_text:[{type:'text',text:{content:l}}]}});
+  }
+  return blocks;
+}
+
+// IMAGES
+function buildPrompts(title, kw, style) {
+  var s = {warm:'warm natural lighting, cozy Korean traditional medicine atmosphere',clean:'clean minimal, white background, modern medical style',natural:'natural everyday life, candid authentic Korean lifestyle',professional:'professional medical, clinical clean, trustworthy healthcare'};
+  var sd = s[style]||s.warm, topic = (title||kw||'한의원 건강 블로그')+' / '+kw;
+  return [
+    {label:'📸 실사 썸네일', p:`Professional Korean medical blog thumbnail. Topic: ${topic}. Scene: ${sd}, adult Korean patient experiencing the condition, kind Korean doctor in white coat nearby. Photorealistic, no text, no watermark, 1:1 square.`},
+    {label:'🎨 일러스트 1 (원인)', p:`Clean flat-style medical infographic illustration. Topic: cause of ${topic}. Simple anatomical body diagram, soft pastel colors, sage green and warm beige, minimal line art, white background, no text, 1:1 square.`},
+    {label:'🎨 일러스트 2 (치료)', p:`Clean flat-style illustration, Korean traditional medicine blog. Topic: healing for ${topic}. Serene acupuncture treatment scene, soft warm colors, optimistic mood, white background, no text, 1:1 square.`}
+  ];
+}
+
+async function genImages() {
+  if(!G.geminiKey) { alert('설정 탭에서 Gemini API 키를 먼저 입력해주세요.'); showPanel('settings'); return; }
+  var title = document.getElementById('imgTitle').value.trim();
+  var kw = document.getElementById('imgKw').value.trim();
+  var style = document.getElementById('imgStyle').value;
+  var prompts = buildPrompts(title, kw, style);
+  var btn = document.getElementById('imgBtn');
+  btn.disabled = true; btn.textContent = '생성 중...';
+  setImgMsg('info','이미지를 생성하고 있습니다... (장당 약 10~20초 소요)');
+  for(var i=0; i<3; i++) {
+    var slot = document.getElementById('slot'+i);
+    slot.innerHTML = `<div class="spinner"></div><div class="slot-lbl" style="font-size:10px">${prompts[i].label}<br>생성 중...</div>`;
+    slot.className = 'img-slot loading';
+    setImgMsg('info',`(${i+1}/3) ${prompts[i].label} 생성 중...`);
+    try {
+      var res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${G.geminiKey}`,
+        {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instances:[{prompt:prompts[i].p}],parameters:{sampleCount:1,aspectRatio:'1:1',safetyFilterLevel:'block_few'}})});
+      var data = await res.json();
+      if(data.error) throw new Error(data.error.message);
+      var b64 = data.predictions?.[0]?.bytesBase64Encoded;
+      if(!b64) throw new Error('이미지 없음');
+      var src = 'data:image/png;base64,'+b64;
+      var idx = i;
+      slot.innerHTML = `<img src="${src}" alt="${prompts[idx].label}"><button class="dl-btn" onclick="dlImg('${src}','nugo_${idx+1}.png')">다운로드</button>`;
+      slot.className = 'img-slot loaded';
+    } catch(e) {
+      slot.innerHTML = `<div class="slot-lbl" style="color:var(--red);font-size:10px">오류: ${e.message}</div>`;
+      slot.className = 'img-slot';
+    }
+  }
+  setImgMsg('ok','✓ 이미지 생성 완료! 이미지 위에 마우스를 올리면 다운로드 버튼이 나타납니다.');
+  btn.disabled = false; btn.textContent = '🔄 이미지 재생성';
+}
+function setImgMsg(type, txt) {
+  var el = document.getElementById('imgMsg');
+  var cls = {ok:'al-ok',err:'al-err',info:'al-info'};
+  var ico = {ok:'✅',err:'❌',info:'⏳'};
+  el.innerHTML = `<div class="alert ${cls[type]}"><span class="al-icon">${ico[type]}</span><span>${txt}</span></div>`;
+}
+function dlImg(src, name) { var a = document.createElement('a'); a.href=src; a.download=name; a.click(); }
+
+// HISTORY
+function addHistory() {
+  G.history.unshift({title:G.title,type:G.type,len:G.len,time:new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})});
+  renderHistory();
+}
+function renderHistory() {
+  document.getElementById('histBadge').textContent = G.history.length;
+  var el = document.getElementById('histList');
+  if(!G.history.length) { el.innerHTML='<div style="text-align:center;padding:36px;color:var(--hint);font-size:13px">아직 작성된 글이 없습니다.</div>'; return; }
+  var ico = {'증상별 치료':'🔴','한약·제품 소개':'🟠','건강 상식':'🟢','원장 일상':'🔵'};
+  el.innerHTML = G.history.map(h => `<div class="hist-item"><span class="hist-ico">${ico[h.type]||'📝'}</span><div><div class="hist-title">${h.title}</div><div class="hist-meta">${h.type} · ${h.len} · ${h.time}</div></div></div>`).join('');
+}
+
+// RESET
+function resetAll() {
+  G.title=''; G.body='';
+  document.getElementById('kw').value='';
+  document.getElementById('ct').value='';
+  gotoStep(0); showPanel('write');
+}
+
+// INIT
+updateDots(); gotoStep(0); renderHistory();
+</script>
+</body>
+</html>
