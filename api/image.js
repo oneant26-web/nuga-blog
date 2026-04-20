@@ -12,8 +12,8 @@ export default async function handler(req, res) {
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ error: '프롬프트가 없습니다.' });
 
-  // gemini-2.0-flash-exp — 무료 이미지 생성 가능
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiKey}`;
+  // gemini-2.5-flash-image — 무료 할당량 있음, generateContent 방식
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${geminiKey}`;
 
   try {
     const response = await fetch(url, {
