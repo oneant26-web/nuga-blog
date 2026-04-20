@@ -12,26 +12,42 @@ export default async function handler(req, res) {
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ error: '프롬프트가 없습니다.' });
 
-  // Imagen 4 Fast — 현재 사용 가능한 최신 모델
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key=${geminiKey}`;
+  // gemini-2.0-flash-preview-image-generation — 무료 할당량 있음
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${geminiKey}`;
 
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        instances: [{ prompt }],
-        parameters: { sampleCount: 1, aspectRatio: '1:1' }
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
       })
     });
 
-    const data = await response.json();
-    if (data.error) return res.status(500).json({ error: data.error.message });
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      return res.status(500).json({ error: `응답 파싱 실패: ${text.substring(0, 300)}` });
+    }
 
-    const b64 = data.predictions?.[0]?.bytesBase64Encoded;
-    if (!b64) return res.status(500).json({ error: '이미지 데이터가 없습니다.' });
+    if (data.error) {
+      return res.status(500).json({ error: data.error.message || JSON.stringify(data.error) });
+    }
 
-    return res.status(200).json({ image: b64, mimeType: 'image/png' });
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const imgPart = parts.find(p => p.inlineData);
+
+    if (!imgPart) {
+      return res.status(500).json({ error: `이미지 미생성. 전체응답: ${JSON.stringify(data).substring(0, 300)}` });
+    }
+
+    return res.status(200).json({
+      image: imgPart.inlineData.data,
+      mimeType: imgPart.inlineData.mimeType || 'image/png'
+    });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
