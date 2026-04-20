@@ -6,48 +6,22 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const geminiKey = req.headers['x-gemini-key'];
-  if (!geminiKey) return res.status(401).json({ error: 'Gemini API 키가 없습니다.' });
-
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ error: '프롬프트가 없습니다.' });
 
-  // gemini-2.5-flash-image — 무료 할당량 있음, generateContent 방식
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${geminiKey}`;
-
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
-      })
-    });
+    // Pollinations AI — 완전 무료, API 키 불필요
+    const encoded = encodeURIComponent(prompt);
+    const seed = Math.floor(Math.random() * 999999);
+    const url = `https://image.pollinations.ai/prompt/${encoded}?width=1024&height=1024&seed=${seed}&nologo=true&enhance=true`;
 
-    const text = await response.text();
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      return res.status(500).json({ error: `응답 파싱 실패: ${text.substring(0, 300)}` });
-    }
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Pollinations 오류: ${response.status}`);
 
-    if (data.error) {
-      return res.status(500).json({ error: data.error.message || JSON.stringify(data.error) });
-    }
+    const arrayBuffer = await response.arrayBuffer();
+    const b64 = Buffer.from(arrayBuffer).toString('base64');
 
-    const parts = data.candidates?.[0]?.content?.parts || [];
-    const imgPart = parts.find(p => p.inlineData);
-
-    if (!imgPart) {
-      return res.status(500).json({ error: `이미지 미생성. 응답: ${JSON.stringify(data).substring(0, 300)}` });
-    }
-
-    return res.status(200).json({
-      image: imgPart.inlineData.data,
-      mimeType: imgPart.inlineData.mimeType || 'image/png'
-    });
+    return res.status(200).json({ image: b64, mimeType: 'image/jpeg' });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
